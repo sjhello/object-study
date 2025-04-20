@@ -1,4 +1,4 @@
-package org.sjhello.sjobject.chapter4;
+package org.sjhello.sjobject.chapter4.step1;
 
 public enum DiscountConditionType {
 	SEQUENCE("순번 조건"),

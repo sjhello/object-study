@@ -1,4 +1,4 @@
-package org.sjhello.sjobject.chapter4;
+package org.sjhello.sjobject.chapter4.step2;
 
 import org.sjhello.sjobject.chapter4.money.Money;
 

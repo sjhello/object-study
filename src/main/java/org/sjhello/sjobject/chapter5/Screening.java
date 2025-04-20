@@ -2,7 +2,7 @@ package org.sjhello.sjobject.chapter5;
 
 import java.time.LocalDateTime;
 
-import org.sjhello.sjobject.chapter4.Customer;
+import org.sjhello.sjobject.chapter4.step1.Customer;
 import org.sjhello.sjobject.chapter5.money.Money;
 
 import lombok.Getter;

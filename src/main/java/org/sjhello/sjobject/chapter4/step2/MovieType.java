@@ -1,4 +1,4 @@
-package org.sjhello.sjobject.chapter4;
+package org.sjhello.sjobject.chapter4.step2;
 
 public enum MovieType {
 	AMOUNT_DISCOUNT("금액 할인 정책"),
