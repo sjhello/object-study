@@ -1,6 +1,6 @@
 package org.sjhello.sjobject.chapter5;
 
-public class SequenceCondition {
+public class SequenceCondition implements DiscountCondition{
 	private int sequence;
 
 	public boolean isSatisfiedBy(Screening screening) {
