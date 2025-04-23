@@ -7,41 +7,66 @@ import org.sjhello.sjobject.chapter4.money.Money;
  */
 public class ReservationAgency {
 	public Reservation reserve(Screening screening, Customer customer, int audienceCount) {
-		Movie movie = screening.getMovie();
-
-		// 할인 가능 여부 확인
-		boolean discountable = false;
-		for (DiscountCondition condition: movie.getConditions()) {
-			if (condition.getType() == DiscountConditionType.PERIOD) {
-				discountable = screening.getWhenScreened().getDayOfWeek().equals(condition.getDayOfWeek())
-					&& condition.getStartTime().compareTo(screening.getWhenScreened().toLocalTime()) <= 0
-					&& condition.getEndTime().compareTo(screening.getWhenScreened().toLocalTime()) >= 0;
-			} else {
-				discountable = condition.getSequence() == screening.getSequence();
-			}
-
-			if (discountable) break;
-		}
-
-		// 할인 가능 여부에 따라서 적절한 할인 정책을 계산
-		Money fee;
-		if (discountable) {
-			Money discountAmount = Money.ZERO;
-			switch (movie.getMovieType()) {
-				case AMOUNT_DISCOUNT:
-					discountAmount = movie.getDiscountAmount();
-				break;
-				case PERCENT_DISCOUNT:
-					discountAmount = movie.getFee().times(movie.getDiscountPercent());
-				break;
-				case NONE_DISCOUNT:
-					discountAmount = Money.ZERO;
-				break;
-			}
-			fee = movie.getFee().minus(discountAmount);
-		} else {
-			fee = movie.getFee();
-		}
+		boolean discountable = checkDiscountable(screening);
+		Money fee = calculateFee(discountable, screening, audienceCount);
 		return new Reservation(customer, screening, fee, audienceCount);
+	}
+
+	private boolean checkDiscountable(Screening screening) {
+		return screening.getMovie().getConditions().stream()
+			.anyMatch(condition -> isDiscountable(condition, screening));
+	}
+
+	private boolean isDiscountable(DiscountCondition condition, Screening screening) {
+		if (condition.getType() == DiscountConditionType.PERIOD) {
+			return isSatisfiedByPeriod(screening, condition);
+		}
+		return isSatisfiedBySequence(screening, condition);
+	}
+
+	private boolean isSatisfiedBySequence(Screening screening, DiscountCondition condition) {
+		return condition.getSequence() == screening.getSequence();
+	}
+
+	private boolean isSatisfiedByPeriod(Screening screening, DiscountCondition condition) {
+		return screening.getWhenScreened().getDayOfWeek().equals(condition.getDayOfWeek())
+			&& condition.getStartTime().compareTo(screening.getWhenScreened().toLocalTime()) <= 0
+			&& condition.getEndTime().compareTo(screening.getWhenScreened().toLocalTime()) >= 0;
+	}
+
+	private Money calculateFee(boolean discountable, Screening screening, int audienceCount) {
+		if (discountable) {
+			return screening.getMovie().getFee()
+				.minus(calculateDiscountFee(screening.getMovie()))
+				.times(audienceCount);
+		}
+		return screening.getMovie().getFee().times(audienceCount);
+	}
+
+	private Money calculateDiscountFee(Movie movie) {
+		switch (movie.getMovieType()) {
+			case AMOUNT_DISCOUNT -> {
+				return calculateAmountDiscountFee(movie);
+			}
+			case PERCENT_DISCOUNT -> {
+				return calculatePercentDiscountFee(movie);
+			}
+			case NONE_DISCOUNT -> {
+				return calculateNoneDiscountFee();
+			}
+		}
+		throw new IllegalArgumentException();
+	}
+
+	private Money calculateNoneDiscountFee() {
+		return Money.ZERO;
+	}
+
+	private Money calculatePercentDiscountFee(Movie movie) {
+		return movie.getFee().times(movie.getDiscountPercent());
+	}
+
+	private Money calculateAmountDiscountFee(Movie movie) {
+		return movie.getDiscountAmount();
 	}
 }
