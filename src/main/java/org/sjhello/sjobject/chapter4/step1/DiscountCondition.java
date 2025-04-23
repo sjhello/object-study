@@ -1,4 +1,4 @@
-package org.sjhello.sjobject.chapter4;
+package org.sjhello.sjobject.chapter4.step1;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
